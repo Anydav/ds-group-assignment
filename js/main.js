@@ -2,7 +2,7 @@
 import { MODE, ADMIN_NAME } from "./config.js";
 import { cleanName, sameName } from "./assign.js";
 import { store, isShared } from "./storage.js";
-import { resultHtml, groupsHtml, bannerText } from "./ui.js";
+import { resultHtml, groupsHtml, bannerText, groupById } from "./ui.js";
 
 const isTest = MODE !== "active";
 const el = {
@@ -49,8 +49,10 @@ async function getMyGroup() {
     el.msg.textContent = "All places are taken. Please speak to your teacher.";
     return;
   }
+  el.result.style.setProperty("--group-color", groupById(entry.group).color);
   el.result.innerHTML = resultHtml(entry);
   el.result.hidden = false;
+  el.result.scrollIntoView({ behavior: "smooth", block: "nearest" });
 }
 
 // Disables the button while it works and shows a friendly message on failure.

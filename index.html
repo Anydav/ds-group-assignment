@@ -3,14 +3,19 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#3b5bdb">
   <title>Data Science Group Assignment</title>
   <link rel="stylesheet" href="css/styles.css">
   <script type="module" src="js/main.js"></script>
 </head>
 <body>
+  <header class="hero">
+    <span class="hero-tag">Data Science</span>
+    <h1>Group Assignment</h1>
+    <p>Type your full name to get your group and the table you will work on.</p>
+  </header>
+
   <main>
-    <h1>Data Science Group Assignment</h1>
-    <p class="subtitle">Type your full name to get your group and the table you will work on.</p>
     <div id="banner" class="banner" hidden></div>
 
     <div class="card">
@@ -23,7 +28,7 @@
     <div id="result" class="card result" hidden></div>
 
     <button id="showAll" class="secondary">Show all groups</button>
-    <div id="list" style="margin-top:14px"></div>
+    <div id="list"></div>
   </main>
 </body>
 </html>

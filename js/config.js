@@ -2,7 +2,7 @@
 
 // "test" while you check the site, "active" when students can use it.
 // Test and active entries are stored separately, so test data never reaches students.
-export const MODE = "test";
+export const MODE = "active";
 
 // From Firebase console → Project settings → Your apps (see README.md).
 // Set to null to save entries in this browser only, which is handy for a quick try.
