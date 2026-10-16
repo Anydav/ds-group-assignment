@@ -13,6 +13,10 @@ js/ui.js          builds the result and group cards
 js/main.js        connects buttons to everything else
 ```
 
+## Updating the site
+After editing any file in `css/` or `js/`, raise the `v=` number on every versioned line in `index.html`
+(for example `v=3` → `v=4`). Otherwise Safari may keep showing the old version.
+
 ## 1. Set up Firebase (free, about 5 minutes)
 1. Go to https://console.firebase.google.com, click **Add project**, and turn Analytics off.
 2. Open **Build → Realtime Database → Create database**, then pick **Start in test mode**.
