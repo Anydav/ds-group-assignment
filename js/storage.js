@@ -2,7 +2,7 @@
 // Both stores have the same methods: load(), claim(name), loadWaitlist(), joinWaitlist(name),
 // placeWaitlist(), reset().
 import { MODE, FIREBASE_CONFIG } from "./config.js";
-import { assign, joinWaitlist, placeWaitlist } from "./assign.js";
+import { assign, joinWaitlist, placeWaitlist, stillWaiting } from "./assign.js";
 
 const FIREBASE_URL = "https://www.gstatic.com/firebasejs/10.12.2";
 const STORE_KEY = MODE === "active" ? "live" : "test";
@@ -42,9 +42,12 @@ async function firebaseStore() {
     async joinWaitlist(name) {
       return (await update(waitRef, (list) => joinWaitlist(list, name))).position;
     },
+    // Places everyone waiting, then takes every name that now has a place off the waitlist.
     async placeWaitlist() {
       const waitlist = (await rtdb.get(waitRef)).val() || [];
-      return (await update(ref, (list) => placeWaitlist(list, waitlist))).placed;
+      const { list, placed } = await update(ref, (current) => placeWaitlist(current, waitlist));
+      await update(waitRef, (current) => ({ list: stillWaiting(current, list) }));
+      return placed;
     },
     async reset() {
       await Promise.all([rtdb.remove(ref), rtdb.remove(waitRef)]);
@@ -79,6 +82,7 @@ function browserStore() {
     async placeWaitlist() {
       const { list, placed } = placeWaitlist(read(key), read(waitKey));
       localStorage.setItem(key, JSON.stringify(list));
+      localStorage.setItem(waitKey, JSON.stringify(stillWaiting(read(waitKey), list)));
       return placed;
     },
     async reset() {

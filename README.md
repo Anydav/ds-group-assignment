@@ -51,7 +51,8 @@ To place the waitlisted students:
 1. Add the new groups to `GROUPS` (one table per member) and add them to `FILL_ORDER`, for example `[7, 8]`.
 2. Raise the `v=` numbers in `index.html` and push.
 3. Type `admin` and press **Place waitlisted students**. Everyone still waiting gets a place, in waitlist
-   order, until the places run out. Pressing it again skips students who already have a place.
+   order, until the places run out, and everyone with a place is taken off the waitlist.
+   Anyone left over stays on it, in the same order.
 4. Students type their name to see their group, just like everyone else.
 
 To take more names after that, move `WAITLIST_CLOSES` later, raise the `v=` numbers and push.
