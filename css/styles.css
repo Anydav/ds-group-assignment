@@ -132,6 +132,7 @@ button.danger { background: var(--danger); }
 .detail { background: var(--bg); border-radius: 12px; padding: 10px 12px; }
 .detail span { display: block; font-size: .78rem; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
 .detail b { font-size: 1.02rem; word-break: break-word; }
+.result-note { color: var(--muted); font-size: .92rem; margin: 14px 0 0; }
 
 @keyframes pop {
   from { opacity: 0; transform: translateY(6px); }

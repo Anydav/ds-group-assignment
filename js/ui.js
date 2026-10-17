@@ -1,5 +1,6 @@
 // Builds the HTML for each part of the page. No storage calls here.
-import { GROUPS, LEAD_MEMBER } from "./config.js";
+import { GROUPS, LEAD_MEMBER, WAITLIST_CLOSES } from "./config.js";
+import { sameName } from "./assign.js";
 
 const escapeHtml = (s) =>
   s.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
@@ -17,6 +18,45 @@ export function resultHtml(entry) {
       <div class="detail"><span>Your role</span><b>${role}</b></div>
       <div class="detail"><span>Your table</span><b>${g.tables[entry.member - 1]}</b></div>
     </div>`;
+}
+
+const closingTime = () =>
+  WAITLIST_CLOSES.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
+
+export function waitlistResultHtml(name, position, { isClosed }) {
+  const next = isClosed
+    ? "The waitlist is closed. Your group is being set up. Type your name here again later to see it."
+    : `The waitlist closes at ${closingTime()}. Once your group is set up, type your name here again to see it.`;
+  return `
+    <p class="result-hi">Hi ${escapeHtml(name)}, all groups are full right now</p>
+    <p class="result-group">You are on the waitlist</p>
+    <div class="result-details">
+      <div class="detail"><span>Your place</span><b>#${position}</b></div>
+      <div class="detail"><span>Status</span><b>${isClosed ? "Closed" : "Open"}</b></div>
+    </div>
+    <p class="result-note">${next}</p>`;
+}
+
+// Admin only: everyone on the waitlist, and the group each one ended up in, if any.
+function waitlistCardHtml(waitlist, list) {
+  const rows = waitlist.map((w, i) => {
+    const entry = list.find((a) => sameName(a.name, w.name));
+    const where = entry ? `Group ${entry.group} · Member ${entry.member}` : "Waiting";
+    return `
+      <div class="row${entry ? "" : " open"}">
+        <span class="num">${i + 1}</span>
+        <span class="who">${escapeHtml(w.name)}</span>
+        <span class="table">${where}</span>
+      </div>`;
+  }).join("");
+
+  const waiting = waitlist.filter((w) => !list.some((a) => sameName(a.name, w.name))).length;
+  const status = Date.now() >= WAITLIST_CLOSES ? "closed" : `closes ${closingTime()}`;
+  return `
+    <section class="card group" style="--group-color:var(--accent)">
+      <h3>Waitlist · ${status} <span class="count">${waiting} waiting</span></h3>
+      ${rows || `<p class="muted">Nobody yet</p>`}
+    </section>`;
 }
 
 // Students see only filled slots; the admin also sees open ones.
@@ -42,13 +82,14 @@ function groupCardHtml(group, list, isAdmin) {
     </section>`;
 }
 
-export function groupsHtml(list, { isAdmin, canReset }) {
+export function groupsHtml(list, { isAdmin, canReset, waitlist = [] }) {
   const total = GROUPS.reduce((n, g) => n + g.tables.length, 0);
   const title = isAdmin ? "Admin view" : "All groups";
   const header = `<div class="card summary">${title} · ${list.length}/${total} students assigned</div>`;
+  const wait = isAdmin ? waitlistCardHtml(waitlist, list) : "";
   const cards = GROUPS.map((g) => groupCardHtml(g, list, isAdmin)).join("");
   const reset = canReset ? `<button id="reset" class="danger">Clear all test entries</button>` : "";
-  return header + cards + reset;
+  return header + wait + cards + reset;
 }
 
 export function bannerText({ isTest, isShared }) {

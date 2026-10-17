@@ -38,3 +38,15 @@ For example, run `npx serve` in this folder, or use the VS Code "Live Server" ex
 ## 3. Go live
 In `js/config.js` change `MODE` to `"active"` and push. Live entries are stored separately from test entries,
 so students start with an empty list.
+
+## 4. Waitlist and extra groups
+When every group is full, students who type their name join a waitlist and see their place in the queue.
+The list is saved at `/waitlist/live`. Type `admin` to see who is on it and how many are still waiting.
+
+The waitlist closes at `WAITLIST_CLOSES` in `js/config.js`. After that, new names are turned away,
+and only names already on the waitlist can take places in new groups.
+
+To place the waitlisted students:
+1. Add the new groups to `GROUPS` (one table per member) and add them to `FILL_ORDER`, for example `[7, 8]`.
+2. Raise the `v=` numbers in `index.html` and push.
+3. Each waitlisted student types their name again and gets the next free place, just like before.

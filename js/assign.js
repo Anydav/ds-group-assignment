@@ -31,3 +31,11 @@ export function assign(list, name) {
   const entry = { name: cleanName(name), group: slot.group, member: slot.member, at: Date.now() };
   return { list: [...list, entry], entry };
 }
+
+// Returns { list, position }: adds the name to the end of the waitlist unless it is already there.
+// position starts at 1.
+export function joinWaitlist(list, name) {
+  const index = list.findIndex((w) => sameName(w.name, name));
+  if (index >= 0) return { list, position: index + 1 };
+  return { list: [...list, { name: cleanName(name), at: Date.now() }], position: list.length + 1 };
+}

@@ -1,8 +1,8 @@
 // Connects the page's buttons to the store and the views.
-import { MODE, ADMIN_NAME } from "./config.js";
+import { MODE, ADMIN_NAME, WAITLIST_CLOSES } from "./config.js";
 import { cleanName, sameName } from "./assign.js";
 import { store, isShared } from "./storage.js";
-import { resultHtml, groupsHtml, bannerText, groupById } from "./ui.js";
+import { resultHtml, waitlistResultHtml, groupsHtml, bannerText, groupById } from "./ui.js";
 
 const isTest = MODE !== "active";
 const el = {
@@ -22,13 +22,13 @@ function showBanner() {
 }
 
 async function showGroups(isAdmin) {
-  const list = await store.load();
-  el.list.innerHTML = groupsHtml(list, { isAdmin, canReset: isAdmin && isTest });
+  const [list, waitlist] = await Promise.all([store.load(), isAdmin ? store.loadWaitlist() : []]);
+  el.list.innerHTML = groupsHtml(list, { isAdmin, canReset: isAdmin && isTest, waitlist });
   document.getElementById("reset")?.addEventListener("click", resetTestData);
 }
 
 async function resetTestData() {
-  if (!confirm("Delete all test entries?")) return;
+  if (!confirm("Delete all test entries and the test waitlist?")) return;
   await store.reset();
   await showGroups(true);
 }
@@ -44,13 +44,29 @@ async function getMyGroup() {
     return;
   }
 
-  const entry = await store.claim(name);
-  if (!entry) {
-    el.msg.textContent = "All places are taken. Please speak to your teacher.";
+  const [list, waitlist] = await Promise.all([store.load(), store.loadWaitlist()]);
+  const isAssigned = list.some((a) => sameName(a.name, name));
+  const waitIndex = waitlist.findIndex((w) => sameName(w.name, name));
+  const isClosed = Date.now() >= WAITLIST_CLOSES;
+
+  // After closing time, new places are kept for the students on the waitlist.
+  if (!isAssigned && isClosed && waitIndex < 0) {
+    el.msg.textContent = "The waitlist is closed. Please speak to your teacher.";
     return;
   }
-  el.result.style.setProperty("--group-color", groupById(entry.group).color);
-  el.result.innerHTML = resultHtml(entry);
+
+  const entry = await store.claim(name);
+  if (entry) {
+    showResult(groupById(entry.group).color, resultHtml(entry));
+  } else {
+    const position = isClosed ? waitIndex + 1 : await store.joinWaitlist(name);
+    showResult("var(--accent)", waitlistResultHtml(cleanName(name), position, { isClosed }));
+  }
+}
+
+function showResult(color, html) {
+  el.result.style.setProperty("--group-color", color);
+  el.result.innerHTML = html;
   el.result.hidden = false;
   el.result.scrollIntoView({ behavior: "smooth", block: "nearest" });
 }

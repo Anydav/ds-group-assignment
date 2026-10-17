@@ -32,6 +32,13 @@ export const GROUPS = [
 // Member number of the group lead.
 export const LEAD_MEMBER = 2;
 
+// When every group is full, new students join a waitlist instead. It closes at this time, read from
+// each student's device clock (so it is local time where they are). After it closes, only names on
+// the waitlist can take places in groups you add later.
+// To place them: add the new groups to GROUPS and to FILL_ORDER (e.g. [7, 8]), bump v= in index.html,
+// and push. Each waitlisted student then gets the next free place when they type their name again.
+export const WAITLIST_CLOSES = new Date("2026-10-17T20:00:00");
+
 // Groups fill in pairs, taking turns: G1-M1, G2-M1, G1-M2, G2-M2 … until both are full,
 // then the next pair starts.
 export const FILL_ORDER = [[1, 2], [3, 4], [5, 6]];
