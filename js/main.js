@@ -1,6 +1,6 @@
 // Connects the page's buttons to the store and the views.
 import { MODE, ADMIN_NAME, WAITLIST_CLOSES } from "./config.js";
-import { cleanName, sameName } from "./assign.js";
+import { cleanName, sameName, stillWaiting } from "./assign.js";
 import { store, isShared } from "./storage.js";
 import { resultHtml, waitlistResultHtml, groupsHtml, bannerText, groupById } from "./ui.js";
 
@@ -25,6 +25,14 @@ async function showGroups(isAdmin) {
   const [list, waitlist] = await Promise.all([store.load(), isAdmin ? store.loadWaitlist() : []]);
   el.list.innerHTML = groupsHtml(list, { isAdmin, canReset: isAdmin && isTest, waitlist });
   document.getElementById("reset")?.addEventListener("click", resetTestData);
+  const place = document.getElementById("placeWaitlist");
+  if (place) onClick(place, () => placeWaitlisted(place.dataset.count));
+}
+
+async function placeWaitlisted(count) {
+  if (!confirm(`Place ${count} waitlisted students into the open places, in waitlist order?`)) return;
+  await store.placeWaitlist();
+  await showGroups(true);
 }
 
 async function resetTestData() {
@@ -48,18 +56,23 @@ async function getMyGroup() {
   const isAssigned = list.some((a) => sameName(a.name, name));
   const waitIndex = waitlist.findIndex((w) => sameName(w.name, name));
   const isClosed = Date.now() >= WAITLIST_CLOSES;
+  const isNew = !isAssigned && waitIndex < 0;
 
   // After closing time, new places are kept for the students on the waitlist.
-  if (!isAssigned && isClosed && waitIndex < 0) {
+  if (isNew && isClosed) {
     el.msg.textContent = "The waitlist is closed. Please speak to your teacher.";
     return;
   }
 
-  const entry = await store.claim(name);
+  // While anyone is still waiting, open places go to them first and a new name joins the queue.
+  const entry = isNew && stillWaiting(waitlist, list).length ? null : await store.claim(name);
   if (entry) {
     showResult(groupById(entry.group).color, resultHtml(entry));
   } else {
-    const position = isClosed ? waitIndex + 1 : await store.joinWaitlist(name);
+    if (!isClosed) await store.joinWaitlist(name);
+    // The place counts only students still waiting, not those already given a group.
+    const queue = stillWaiting(await store.loadWaitlist(), list);
+    const position = queue.findIndex((w) => sameName(w.name, name)) + 1;
     showResult("var(--accent)", waitlistResultHtml(cleanName(name), position, { isClosed }));
   }
 }

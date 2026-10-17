@@ -43,10 +43,15 @@ so students start with an empty list.
 When every group is full, students who type their name join a waitlist and see their place in the queue.
 The list is saved at `/waitlist/live`. Type `admin` to see who is on it and how many are still waiting.
 
-The waitlist closes at `WAITLIST_CLOSES` in `js/config.js`. After that, new names are turned away,
-and only names already on the waitlist can take places in new groups.
+The waitlist closes at `WAITLIST_CLOSES` in `js/config.js`. While anyone is still waiting, open places
+go to the waitlist first, so a new name joins the queue instead. After closing time, new names are turned
+away, and only names already on the waitlist can take places in new groups.
 
 To place the waitlisted students:
 1. Add the new groups to `GROUPS` (one table per member) and add them to `FILL_ORDER`, for example `[7, 8]`.
 2. Raise the `v=` numbers in `index.html` and push.
-3. Each waitlisted student types their name again and gets the next free place, just like before.
+3. Type `admin` and press **Place waitlisted students**. Everyone still waiting gets a place, in waitlist
+   order, until the places run out. Pressing it again skips students who already have a place.
+4. Students type their name to see their group, just like everyone else.
+
+To take more names after that, move `WAITLIST_CLOSES` later, raise the `v=` numbers and push.

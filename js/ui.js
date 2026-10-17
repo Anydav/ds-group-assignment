@@ -1,6 +1,6 @@
 // Builds the HTML for each part of the page. No storage calls here.
 import { GROUPS, LEAD_MEMBER, WAITLIST_CLOSES } from "./config.js";
-import { sameName } from "./assign.js";
+import { sameName, stillWaiting } from "./assign.js";
 
 const escapeHtml = (s) =>
   s.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
@@ -20,8 +20,9 @@ export function resultHtml(entry) {
     </div>`;
 }
 
+// e.g. "Sun 2:00 PM", so it is clear when the closing time is on another day.
 const closingTime = () =>
-  WAITLIST_CLOSES.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
+  WAITLIST_CLOSES.toLocaleString([], { weekday: "short", hour: "numeric", minute: "2-digit" });
 
 export function waitlistResultHtml(name, position, { isClosed }) {
   const next = isClosed
@@ -38,7 +39,8 @@ export function waitlistResultHtml(name, position, { isClosed }) {
 }
 
 // Admin only: everyone on the waitlist, and the group each one ended up in, if any.
-function waitlistCardHtml(waitlist, list) {
+// The place button shows while someone is waiting and there are open places.
+function waitlistCardHtml(waitlist, list, openPlaces) {
   const rows = waitlist.map((w, i) => {
     const entry = list.find((a) => sameName(a.name, w.name));
     const where = entry ? `Group ${entry.group} · Member ${entry.member}` : "Waiting";
@@ -50,12 +52,17 @@ function waitlistCardHtml(waitlist, list) {
       </div>`;
   }).join("");
 
-  const waiting = waitlist.filter((w) => !list.some((a) => sameName(a.name, w.name))).length;
+  const waiting = stillWaiting(waitlist, list).length;
   const status = Date.now() >= WAITLIST_CLOSES ? "closed" : `closes ${closingTime()}`;
+  const toPlace = Math.min(waiting, openPlaces);
+  const place = toPlace
+    ? `<button id="placeWaitlist" data-count="${toPlace}">Place ${toPlace} waitlisted student${toPlace === 1 ? "" : "s"}</button>`
+    : "";
   return `
     <section class="card group" style="--group-color:var(--accent)">
       <h3>Waitlist · ${status} <span class="count">${waiting} waiting</span></h3>
       ${rows || `<p class="muted">Nobody yet</p>`}
+      ${place}
     </section>`;
 }
 
@@ -86,7 +93,7 @@ export function groupsHtml(list, { isAdmin, canReset, waitlist = [] }) {
   const total = GROUPS.reduce((n, g) => n + g.tables.length, 0);
   const title = isAdmin ? "Admin view" : "All groups";
   const header = `<div class="card summary">${title} · ${list.length}/${total} students assigned</div>`;
-  const wait = isAdmin ? waitlistCardHtml(waitlist, list) : "";
+  const wait = isAdmin ? waitlistCardHtml(waitlist, list, total - list.length) : "";
   const cards = GROUPS.map((g) => groupCardHtml(g, list, isAdmin)).join("");
   const reset = canReset ? `<button id="reset" class="danger">Clear all test entries</button>` : "";
   return header + wait + cards + reset;

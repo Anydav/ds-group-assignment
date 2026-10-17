@@ -32,6 +32,23 @@ export function assign(list, name) {
   return { list: [...list, entry], entry };
 }
 
+// Waitlist entries that don't have a place in `list` yet, in waitlist order.
+export const stillWaiting = (waitlist, list) =>
+  waitlist.filter((w) => !list.some((a) => sameName(a.name, w.name)));
+
+// Returns { list, placed }: gives each waiting name the next free slot, in waitlist order,
+// until the slots run out. placed is how many names got a place.
+export function placeWaitlist(list, waitlist) {
+  let placed = 0;
+  for (const w of stillWaiting(waitlist, list)) {
+    const result = assign(list, w.name);
+    if (!result.entry) break;
+    list = result.list;
+    placed++;
+  }
+  return { list, placed };
+}
+
 // Returns { list, position }: adds the name to the end of the waitlist unless it is already there.
 // position starts at 1.
 export function joinWaitlist(list, name) {

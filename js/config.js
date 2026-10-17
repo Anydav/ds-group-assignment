@@ -27,18 +27,21 @@ export const GROUPS = [
   { id: 4, name: "University",       color: "#6a1b9a", tables: ["results.csv", "courses.csv", "students.csv", "attendance.csv", "hostel.csv"] },
   { id: 5, name: "Food Delivery",    color: "#ef6c00", tables: ["orders.csv", "restaurants.csv", "riders.csv", "customers.csv", "ratings.csv"] },
   { id: 6, name: "Farm Cooperative", color: "#795548", tables: ["harvests.csv", "crops.csv", "farms.csv", "inputs.csv", "market_sales.csv"] },
+  { id: 7, name: "Online Store",         color: "#00838f", tables: ["orders.csv", "products.csv", "customers.csv", "deliveries.csv", "returns_reviews.csv"] },
+  { id: 8, name: "POS Agent Banking",    color: "#ad1457", tables: ["transactions.csv", "agents.csv", "customers.csv", "cash_float.csv", "complaints.csv"] },
+  { id: 9, name: "Short-let Apartments", color: "#455a64", tables: ["bookings.csv", "apartments.csv", "guests.csv", "payments.csv", "maintenance.csv"] },
 ];
 
 // Member number of the group lead.
 export const LEAD_MEMBER = 2;
 
 // When every group is full, new students join a waitlist instead. It closes at this time, read from
-// each student's device clock (so it is local time where they are). After it closes, only names on
-// the waitlist can take places in groups you add later.
+// each student's device clock (so it is local time where they are). While anyone is waiting, open
+// places go to the waitlist first; after it closes, only names on the waitlist can take places.
 // To place them: add the new groups to GROUPS and to FILL_ORDER (e.g. [7, 8]), bump v= in index.html,
-// and push. Each waitlisted student then gets the next free place when they type their name again.
-export const WAITLIST_CLOSES = new Date("2026-10-17T20:00:00");
+// and push. Then type admin and press "Place waitlisted students" to fill the places in waitlist order.
+export const WAITLIST_CLOSES = new Date("2026-10-18T14:00:00");
 
 // Groups fill in pairs, taking turns: G1-M1, G2-M1, G1-M2, G2-M2 … until both are full,
 // then the next pair starts.
-export const FILL_ORDER = [[1, 2], [3, 4], [5, 6]];
+export const FILL_ORDER = [[1, 2], [3, 4], [5, 6], [7, 8], [9]];

@@ -1,7 +1,8 @@
 // Where the list of assignments and the waitlist are saved: Firebase when configured, otherwise this browser.
-// Both stores have the same methods: load(), claim(name), loadWaitlist(), joinWaitlist(name), reset().
+// Both stores have the same methods: load(), claim(name), loadWaitlist(), joinWaitlist(name),
+// placeWaitlist(), reset().
 import { MODE, FIREBASE_CONFIG } from "./config.js";
-import { assign, joinWaitlist } from "./assign.js";
+import { assign, joinWaitlist, placeWaitlist } from "./assign.js";
 
 const FIREBASE_URL = "https://www.gstatic.com/firebasejs/10.12.2";
 const STORE_KEY = MODE === "active" ? "live" : "test";
@@ -41,6 +42,10 @@ async function firebaseStore() {
     async joinWaitlist(name) {
       return (await update(waitRef, (list) => joinWaitlist(list, name))).position;
     },
+    async placeWaitlist() {
+      const waitlist = (await rtdb.get(waitRef)).val() || [];
+      return (await update(ref, (list) => placeWaitlist(list, waitlist))).placed;
+    },
     async reset() {
       await Promise.all([rtdb.remove(ref), rtdb.remove(waitRef)]);
     },
@@ -70,6 +75,11 @@ function browserStore() {
       const { list, position } = joinWaitlist(read(waitKey), name);
       localStorage.setItem(waitKey, JSON.stringify(list));
       return position;
+    },
+    async placeWaitlist() {
+      const { list, placed } = placeWaitlist(read(key), read(waitKey));
+      localStorage.setItem(key, JSON.stringify(list));
+      return placed;
     },
     async reset() {
       localStorage.removeItem(key);
