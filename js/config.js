@@ -44,7 +44,8 @@ export const LEAD_MEMBER = 2;
 // places go to the waitlist first; after it closes, only names on the waitlist can take places.
 // To place them: add the new groups to GROUPS and to FILL_ORDER (e.g. [7, 8]), bump v= in index.html,
 // and push. Then type admin and press "Place waitlisted students" to fill the places in waitlist order.
-export const WAITLIST_CLOSES = new Date("2026-10-18T14:00:00");
+// Set to null to keep the waitlist open with no closing time.
+export const WAITLIST_CLOSES = null;
 
 // Groups fill in pairs, taking turns: G1-M1, G2-M1, G1-M2, G2-M2 … until both are full,
 // then the next pair starts.

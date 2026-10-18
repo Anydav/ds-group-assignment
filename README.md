@@ -43,7 +43,7 @@ so students start with an empty list.
 When every group is full, students who type their name join a waitlist and see their place in the queue.
 The list is saved at `/waitlist/live`. Type `admin` to see who is on it and how many are still waiting.
 
-The waitlist closes at `WAITLIST_CLOSES` in `js/config.js`. While anyone is still waiting, open places
+The waitlist closes at `WAITLIST_CLOSES` in `js/config.js` (`null` keeps it open). While anyone is still waiting, open places
 go to the waitlist first, so a new name joins the queue instead. After closing time, new names are turned
 away, and only names already on the waitlist can take places in new groups.
 

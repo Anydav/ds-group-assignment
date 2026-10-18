@@ -55,7 +55,7 @@ async function getMyGroup() {
   const [list, waitlist] = await Promise.all([store.load(), store.loadWaitlist()]);
   const isAssigned = list.some((a) => sameName(a.name, name));
   const waitIndex = waitlist.findIndex((w) => sameName(w.name, name));
-  const isClosed = Date.now() >= WAITLIST_CLOSES;
+  const isClosed = WAITLIST_CLOSES !== null && Date.now() >= WAITLIST_CLOSES;
   const isNew = !isAssigned && waitIndex < 0;
 
   // After closing time, new places are kept for the students on the waitlist.

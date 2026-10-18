@@ -27,7 +27,7 @@ const closingTime = () =>
 export function waitlistResultHtml(name, position, { isClosed }) {
   const next = isClosed
     ? "The waitlist is closed. Your group is being set up. Type your name here again later to see it."
-    : `The waitlist closes at ${closingTime()}. Once your group is set up, type your name here again to see it.`;
+    : `${WAITLIST_CLOSES ? `The waitlist closes at ${closingTime()}. ` : ""}Once your group is set up, type your name here again to see it.`;
   return `
     <p class="result-hi">Hi ${escapeHtml(name)}, all groups are full right now</p>
     <p class="result-group">You are on the waitlist</p>
@@ -53,7 +53,8 @@ function waitlistCardHtml(waitlist, list, openPlaces) {
   }).join("");
 
   const waiting = stillWaiting(waitlist, list).length;
-  const status = Date.now() >= WAITLIST_CLOSES ? "closed" : `closes ${closingTime()}`;
+  const status = !WAITLIST_CLOSES ? "open"
+    : Date.now() >= WAITLIST_CLOSES ? "closed" : `closes ${closingTime()}`;
   const toPlace = Math.min(waiting, openPlaces);
   const place = toPlace
     ? `<button id="placeWaitlist" data-count="${toPlace}">Place ${toPlace} waitlisted student${toPlace === 1 ? "" : "s"}</button>`
