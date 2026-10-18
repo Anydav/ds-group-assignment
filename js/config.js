@@ -30,6 +30,10 @@ export const GROUPS = [
   { id: 7, name: "Online Store",         color: "#00838f", tables: ["orders.csv", "products.csv", "customers.csv", "deliveries.csv", "returns_reviews.csv"] },
   { id: 8, name: "POS Agent Banking",    color: "#ad1457", tables: ["transactions.csv", "agents.csv", "customers.csv", "cash_float.csv", "complaints.csv"] },
   { id: 9, name: "Short-let Apartments", color: "#455a64", tables: ["bookings.csv", "apartments.csv", "guests.csv", "payments.csv", "maintenance.csv"] },
+  { id: 10, name: "Filling Stations",     color: "#f9a825", tables: ["sales.csv", "pumps.csv", "attendants.csv", "deliveries.csv", "stock_records.csv"] },
+  { id: 11, name: "Gym Chain",            color: "#5d4037", tables: ["members.csv", "subscriptions.csv", "check_ins.csv", "class_sessions.csv", "class_bookings.csv"] },
+  { id: 12, name: "Cinema",               color: "#283593", tables: ["screenings.csv", "tickets.csv", "snack_orders.csv", "loyalty_customers.csv", "staff_shifts.csv"] },
+  { id: 13, name: "Prepaid Electricity",  color: "#558b2f", tables: ["customers.csv", "meters.csv", "token_purchases.csv", "outages.csv", "complaints.csv"] },
 ];
 
 // Member number of the group lead.
@@ -44,4 +48,4 @@ export const WAITLIST_CLOSES = new Date("2026-10-18T14:00:00");
 
 // Groups fill in pairs, taking turns: G1-M1, G2-M1, G1-M2, G2-M2 … until both are full,
 // then the next pair starts.
-export const FILL_ORDER = [[1, 2], [3, 4], [5, 6], [7, 8], [9]];
+export const FILL_ORDER = [[1, 2], [3, 4], [5, 6], [7, 8], [9], [10, 11], [12, 13]];
